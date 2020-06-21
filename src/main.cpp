@@ -45,7 +45,7 @@ void mouseCallback(GLFWwindow *, int, int, int);
 int main( void ){
     glInit();
 
-    piecesTexture = loadBMP_custom("res/pieces.bmp");
+    piecesTexture = loadBMP_custom("res/piecesSmall.bmp");
 
     glGenVertexArrays(1, &vertexArrayID);
     glBindVertexArray(vertexArrayID);
@@ -72,8 +72,6 @@ int main( void ){
 
     mainBoard = {};
     mainBoard.setDefault();
-
-    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, white, 4));
 
     glfwSetMouseButtonCallback(window, mouseCallback);
 
@@ -108,9 +106,9 @@ void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods)
             } else {
                 mouse.selectedStart = false;
                 mouse.end = selected;
-                if(mainBoard.isValid({mouse.start, mouse.end}, black)){
+                if(mainBoard.isValid({mouse.start, mouse.end}, white)){
                     mainBoard = mainBoard.applyMove({mouse.start, mouse.end});
-                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, white, 3));
+                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, black, 3));
                     dirty = true;
                 }
                 std::cout << "off" << std::endl;
@@ -164,17 +162,6 @@ void glInit(){
 }
 
 void mainLoop(){
-    //make the tip of the triangle follow the cursor
-    if(glfwGetKey(window, GLFW_KEY_R)){
-        pieceProgram = LoadShaders("res/pieceVertex.glsl", "res/pieceFragment.glsl" );
-        dirty = true;
-    }
-
-//    auto moves = mainBoard.validMoves(white);
-//    mainBoard.applyMove(moves[moves.size()*(float(rand())/RAND_MAX)]);
-//
-//    invalid = true;
-
     if(dirty) {
         dirty = false;
 

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iostream>
 #include <assert.h>
+#include <limits>
 
 int movesSearched;
 struct {
@@ -62,13 +63,13 @@ chessMove ai::minimaxHead(const board &startBoard, int depth, side maxPlayerSide
     auto moves = startBoard.validMoves(maxPlayerSide);
     auto values = std::vector<float>(moves.size());
     std::transform(moves.begin(), moves.end(), values.begin(), [&](chessMove move){
-        return minimax(startBoard.applyMove(move), depth, false, maxPlayerSide);
+        return minimax(startBoard.applyMove(move), depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), false, maxPlayerSide);
     });
     int index = std::max_element(values.begin(), values.end()) - values.begin();
     return moves[index];
 }
 
-float ai::minimax(const board &startBoard, int depth, bool maxPlayer, side maxPlayerSide) {
+float ai::minimax(const board &startBoard, int depth, float a, float b, bool maxPlayer, side maxPlayerSide) {
     if(depth == 1){
         return minimaxBase(startBoard, depth, !maxPlayer, maxPlayerSide);
     }
@@ -77,16 +78,39 @@ float ai::minimax(const board &startBoard, int depth, bool maxPlayer, side maxPl
     }
     side evalSide = maxPlayer ? maxPlayerSide : ((maxPlayerSide == white) ? black : white);
     auto moves = startBoard.validMoves(evalSide);
+#if true
+    if(maxPlayer){
+        float value = -std::numeric_limits<float>::infinity();
+        for(auto move : moves){
+            value = std::max(value, minimax(startBoard.applyMove(move), depth - 1, a, b, false, maxPlayerSide));
+            a = std::max(value, a);
+            if (a >= b){
+                break;
+            }
+        }
+        return value;
+    } else {
+        float value = std::numeric_limits<float>::infinity();
+        for(auto move : moves){
+            value = std::min(value, minimax(startBoard.applyMove(move), depth - 1, a, b, true, maxPlayerSide));
+            b = std::min(value, b);
+            if (a >= b){
+                break;
+            }
+        }
+        return value;
+    }
+#else
     auto children = std::vector<float>(moves.size());
-    std::transform(moves.begin(), moves.end(), children.begin(), [startBoard, depth, maxPlayer, maxPlayerSide](chessMove move){
-        board b = startBoard.applyMove(move);
-        return minimax(b, depth - 1, !maxPlayer, maxPlayerSide);
+    std::transform(moves.begin(), moves.end(), children.begin(), [&](chessMove move){
+        return minimax(startBoard.applyMove(move), depth - 1, 0, 0, !maxPlayer, maxPlayerSide);
     });
     if(maxPlayer){
         return *std::max_element(children.begin(), children.end());
     } else {
         return *std::min_element(children.begin(), children.end());
     }
+#endif
 }
 
 float ai::minimaxBase(const board &startBoard, int depth, bool maxPlayer, side maxPlayerSide) {

@@ -170,12 +170,11 @@ moveType piece::isMovable(piece target) const {
 }
 
 float piece::value(square sq) const {
-    float val;
     if(type == pawn){
         if(side == black){
             return pieceValue[type] + float(7 - sq.rank)/100;
         } else {
-            return pieceValue[type] + float(sq.rank - 1)/100;
+            return pieceValue[type] + float(sq.rank)/100;
         }
     }
     return pieceValue[type];

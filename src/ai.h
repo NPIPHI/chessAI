@@ -13,7 +13,10 @@ public:
     static chessMove bestMove(const board &board, side side, int depth);
 
 private:
-    static std::tuple<chessMove, float> minMax(const board &startBoard, side side, int depth, bool max);
+    static std::tuple<chessMove, float> minimaxSlow(const board &startBoard, int depth, bool maxPlayer, side maxPlayerSide);
+    static chessMove minimaxHead(const board &startBoard, int depth, side maxPlayerSide);
+    static float minimax(const board &startBoard, int depth, bool maxPlayer, side maxPlayerSide);
+    static float minimaxBase(const board &startBoard, int depth, bool maxPlayer, side maxPlayerSide);
 };
 
 

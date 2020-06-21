@@ -10,6 +10,7 @@
 #include "piece.h"
 #include "chessMove.h"
 #include "string"
+#include <numeric>
 
 class board {
 public:
@@ -19,11 +20,16 @@ public:
 
     void setDefault();
     bool isValid(chessMove move, enum side side);
-    board applyMove(chessMove move) const;
+    void cacheValue() const;
+    [[nodiscard]] board applyMove(chessMove move) const;
     [[nodiscard]] std::vector<chessMove> validMoves(side side) const;
+    chessMove * inPlaceValidMoves(chessMove * out, side side) const;
     [[nodiscard]] piece atSquare(square sq) const;
     [[nodiscard]] float value(enum side side) const;
-    std::string print() const;
+    [[nodiscard]] float valueAfter(chessMove move, enum side side) const;
+    [[nodiscard]] std::string print() const;
+private:
+    mutable float valueCache;
 };
 
 

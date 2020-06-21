@@ -170,6 +170,7 @@ moveType piece::isMovable(piece target) const {
 }
 
 float piece::value(square sq) const {
+    float val;
     if(type == pawn){
         if(side == black){
             return pieceValue[type] + float(7 - sq.rank)/100;
@@ -197,4 +198,118 @@ char piece::ascii() const {
         case king:
             return 'M';
     }
+    return 'V';
+}
+
+chessMove * piece::inPlaceMoves(chessMove * out, const std::array<std::array<piece, 8>, 8> &board, square pos) const {
+    auto atSquare = [&board](square sq){
+        if(sq.rank >= 0 && sq.rank < 8 && sq.file >= 0 && sq.file < 8){
+            return board[sq.rank][sq.file];
+        } else {
+            return piece{oob, empty};
+        }};
+    if(type == pawn){
+        if(side == white){
+            if(pos.rank == homeRank()){
+                if(atSquare(pos + square(1, 0)).side == neither) {
+                    if (atSquare(pos + square(2, 0)).side == neither) {
+                        *out = {pos, pos + square(2, 0)};
+                        out++;
+                    }
+                }
+            }
+            if(atSquare(pos + square(1, 0)).side == neither){
+                *out = {pos, pos + square(1, 0)};
+                out++;
+            }
+            if(atSquare(pos + square(1, 1)).side == black){
+                *out = {pos, pos + square(1, 1)};
+                out++;
+            }
+            if(atSquare(pos + square(1, -1)).side == black){
+                *out = {pos, pos + square(1, -1)};
+                out++;
+            }
+        }
+        if(side == black){
+            if(pos.rank == homeRank()){
+                if(atSquare(pos + square(-1, 0)).side == neither) {
+                    if (atSquare(pos + square(-2, 0)).side == neither) {
+                        *out = {pos, pos + square(-2, 0)};
+                        out++;
+                    }
+                }
+            }
+            if(atSquare(pos + square(-1, 0)).side == neither){
+                *out = {pos, pos + square(-1, 0)};
+                out++;
+            }
+            if(atSquare(pos + square(-1, 1)).side == white){
+                *out = {pos, pos + square(-1, 1)};
+                out++;
+            }
+            if(atSquare(pos + square(-1, -1)).side == white){
+                *out = {pos, pos + square(-1, -1)};
+                out++;
+            }
+        }
+    }
+    if(type == king){
+        square dirs[] = {{1, 0}, {1, 1}, {1, -1}, {0, 1},
+                         {0, -1}, {-1, 0}, {-1, 1}, {-1, -1}};
+        for(square dir : dirs){
+            if(isMovable(atSquare(pos + dir))){
+                *out = {pos, pos + dir};
+                out++;
+            }
+        }
+    }
+    if(type == rook){
+        square dirs[] = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+        for(square dir : dirs){
+            square offset = dir;
+            while(isMovable(atSquare(pos+offset))){
+                *out = {pos, pos+offset};
+                out++;
+                if(isMovable(atSquare(pos+offset)) == capture) break;
+                offset = offset + dir;
+            }
+        }
+    }
+    if(type == bishop){
+        square dirs[] = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+        for(square dir : dirs){
+            square offset = dir;
+            while(isMovable(atSquare(pos+offset))){
+                *out = {pos, pos+offset};
+                out++;
+                if(isMovable(atSquare(pos+offset)) == capture) break;
+                offset = offset + dir;
+            }
+        }
+    }
+    if(type == queen){
+        square dirs[] = {{1, 0}, {1, 1}, {1, -1}, {0, 1},
+                         {0, -1}, {-1, 0}, {-1, 1}, {-1, -1}};
+        for(square dir : dirs){
+            square offset = dir;
+            while(isMovable(atSquare(pos+offset))){
+                *out = {pos, pos+offset};
+                out++;
+                if(isMovable(atSquare(pos+offset)) == capture) break;
+                offset = offset + dir;
+            }
+        }
+    }
+    if(type == knight){
+        square dirs[] = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1},
+                         {1, 2}, {-1, 2}, {1, -2}, {-1, -2}};
+        for(square dir : dirs){
+            if(isMovable(atSquare(pos + dir))){
+                *out = {pos, pos + dir};
+                out++;
+            }
+        }
+    }
+    return out;
 }

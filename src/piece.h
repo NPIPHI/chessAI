@@ -35,6 +35,7 @@ enum moveType : char {
 class piece {
 public:
     [[nodiscard]] std::vector<chessMove> moves(const std::array<std::array<piece, 8>, 8> &board, square pos) const;
+    chessMove * inPlaceMoves(chessMove *out, const std::array<std::array<piece, 8>, 8> &board, square pos) const;
     side side = neither;
     pieceType type = empty;
     char homeRank() const;

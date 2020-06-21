@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <chrono>
 
 #include <GL/glew.h>
 
@@ -33,8 +34,13 @@ struct {
     square end;
     bool selectedStart;
 } mouse;
+
+auto start = std::chrono::high_resolution_clock::now();
+auto end = std::chrono::high_resolution_clock::now();
+
 bool dirty = true;
 board mainBoard;
+int move;
 
 void terminate();
 void mainLoop();
@@ -80,7 +86,7 @@ int main( void ){
 #else
 	do{
 	    mainLoop();
-	    Sleep(16);
+//	    Sleep(16);
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		   glfwWindowShouldClose(window) == 0);
@@ -108,7 +114,7 @@ void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods)
                 mouse.end = selected;
                 if(mainBoard.isValid({mouse.start, mouse.end}, white)){
                     mainBoard = mainBoard.applyMove({mouse.start, mouse.end});
-                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, black, 3));
+                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, black, 0));
                     dirty = true;
                 }
                 std::cout << "off" << std::endl;
@@ -162,6 +168,25 @@ void glInit(){
 }
 
 void mainLoop(){
+
+    if(move < 50){
+        if(move == 0){
+            start = std::chrono::high_resolution_clock::now();
+        }
+        if(move & 1){
+            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, white, 3));
+        } else {
+            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, black, 3));
+        }
+        dirty = true;
+        move++;
+        if(move == 50){
+            end = std::chrono::high_resolution_clock::now();
+            using namespace std::chrono_literals;
+            std::cout << (end - start)/1ms << std::endl;
+        }
+    }
+
     if(dirty) {
         dirty = false;
 

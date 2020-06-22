@@ -37,48 +37,28 @@ std::vector<float> board::toBuffer() const{
 }
 
 void board::setDefault() {
-//    state[0][0] = {white, rook};
-//    state[0][1] = {white, knight};
-//    state[0][2] = {white, bishop};
-//    state[0][3] = {white, queen};
-//    state[0][4] = {white, king};
-//    state[0][5] = {white, bishop};
-//    state[0][6] = {white, knight};
-//    state[0][7] = {white, rook};
-//    for(piece & p : state[1]){
-//        p = {white, pawn};
-//    }
-//    state[7][0] = {black, rook};
-//    state[7][1] = {black, knight};
-//    state[7][2] = {black, bishop};
-//    state[7][4] = {black, king};
-//    state[7][3] = {black, queen};
-//    state[7][5] = {black, bishop};
-//    state[7][6] = {black, knight};
-//    state[7][7] = {black, rook};
-//    for(piece & p : state[6]){
-//        p = {black, pawn};
-//    }
+    state[0][0] = {white, rook};
+    state[0][1] = {white, knight};
+    state[0][2] = {white, bishop};
+    state[0][3] = {white, queen};
+    state[0][4] = {white, king};
+    state[0][5] = {white, bishop};
+    state[0][6] = {white, knight};
+    state[0][7] = {white, rook};
+    for(piece & p : state[1]){
+        p = {white, pawn};
+    }
+    state[7][0] = {black, rook};
+    state[7][1] = {black, knight};
+    state[7][2] = {black, bishop};
     state[7][4] = {black, king};
-    state[2][3] = {white, bishop};
-    state[3][0] = {black, rook};
+    state[7][3] = {black, queen};
+    state[7][5] = {black, bishop};
     state[7][6] = {black, knight};
     state[7][7] = {black, rook};
-    state[6][1] = {black, pawn};
-    state[6][2] = {black, pawn};
-    state[6][6] = {black, pawn};
-    state[6][7] = {black, pawn};
-    state[5][3] = {black, pawn};
-    state[4][5] = {black, pawn};
-    state[4][6] = {white, pawn};
-    state[3][4] = {white, pawn};
-    state[3][5] = {white, bishop};
-    state[3][7] = {white, pawn};
-    state[2][0] = {black, pawn};
-    state[2][5] = {white, king};
-    state[1][0] = {white, pawn};
-    state[1][2] = {white, pawn};
-    state[0][7] = {white, rook};
+    for(piece & p : state[6]){
+        p = {black, pawn};
+    }
 }
 
 std::vector<chessMove> board::validMoves(side side) const {

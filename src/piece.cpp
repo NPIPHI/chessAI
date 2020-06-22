@@ -176,12 +176,6 @@ float piece::value(square sq, enum side side) const {
             return pieceValue[type] + float(sq.rank)/100;
         }
     }
-//    if(type == king){
-//        if(this->side != side){
-//            //prevents ai from trading kings
-//            return pieceValue[type] * 2;
-//        }
-//    }
     return pieceValue[type];
 }
 

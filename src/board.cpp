@@ -179,7 +179,7 @@ float board::valueAfter(chessMove move, enum side side) const {
     } else {
         value += endPiece.value(move.end, side);
     }
-    if(side == black) value *= -1;
+    if(side== black) value *= -1;
     return value;
 }
 
@@ -218,4 +218,8 @@ std::vector<chessMove> board::validMoves(side side) const {
         return applyMove(move).inCheck(side);
     }), moves.end());
     return moves;
+}
+
+bool board::checkmate(side side) const {
+    return validMoves(side).empty();
 }

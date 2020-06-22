@@ -108,18 +108,26 @@ void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods)
             if(!mouse.selectedStart){
                 mouse.selectedStart = true;
                 mouse.start = selected;
-                std::cout << "on" << std::endl;
             } else {
                 mouse.selectedStart = false;
                 mouse.end = selected;
                 if(mainBoard.isValid({mouse.start, mouse.end}, white)){
+                    dirty = true;
+
                     mainBoard = mainBoard.applyMove({mouse.start, mouse.end});
                     std::cout << mainBoard.print() << std::endl;
+                    if(mainBoard.checkmate(black)){
+                        std::cout << "checkmate!" << std::endl;
+                        return;
+                    }
+
                     mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 5, black));
                     std::cout << mainBoard.print() << std::endl;
-                    dirty = true;
+                    if(mainBoard.checkmate(white)){
+                        std::cout << "checkmate!" << std::endl;
+                        return;
+                    }
                 }
-                std::cout << "off" << std::endl;
             }
         }
     }
@@ -170,6 +178,24 @@ void glInit(){
 }
 
 void mainLoop() {
+
+//    if (move < 20) {
+//        if (move == 0) {
+//            start = std::chrono::high_resolution_clock::now();
+//        }
+//        if (move % 2) {
+//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 3, white));
+//        } else
+//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 3, black));
+//        dirty = true;
+//        move++;
+//        if (move == 50) {
+//            end = std::chrono::high_resolution_clock::now();
+//            using namespace std::chrono_literals;
+//            std::cout << (end - start) / 1ms << "ms" << std::endl;
+//        }
+//    }
+
     if(dirty) {
         dirty = false;
 

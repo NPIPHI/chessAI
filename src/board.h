@@ -28,7 +28,10 @@ public:
     [[nodiscard]] float value(enum side side) const;
     [[nodiscard]] float valueAfter(chessMove move, enum side side) const;
     [[nodiscard]] std::string print() const;
+    [[nodiscard]] bool inCheck(side side) const;
 private:
+    //side being threatened
+    [[nodiscard]] std::vector<square> threatedSquares(side side) const;
     mutable float valueCache;
 };
 

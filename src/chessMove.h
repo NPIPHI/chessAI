@@ -5,6 +5,8 @@
 #ifndef CHESS_CHESSMOVE_H
 #define CHESS_CHESSMOVE_H
 
+#include <iostream>
+
 struct square {
     char rank;
     char file;
@@ -25,6 +27,5 @@ struct chessMove {
         return start == m.start && end == m.end;
     }
 };
-
 
 #endif //CHESS_CHESSMOVE_H

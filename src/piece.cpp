@@ -181,21 +181,22 @@ float piece::value(square sq) const {
 }
 
 char piece::ascii() const {
+    int isBlack = (side == black) ? 32 : 0;
     switch (type) {
         case empty:
             return '_';
         case pawn:
-            return 'p';
+            return 'P' + isBlack;
         case rook:
-            return 'R';
+            return 'R' + isBlack;
         case bishop:
-            return 'B';
+            return 'B' + isBlack;
         case knight:
-            return 'K';
+            return 'K' + isBlack;
         case queen:
-            return 'Q';
+            return 'Q' + isBlack;
         case king:
-            return 'M';
+            return 'M' + isBlack;
     }
     return 'V';
 }

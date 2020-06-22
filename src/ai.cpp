@@ -111,6 +111,13 @@ float ai::minimaxBase(const board &startBoard, int depth, bool maxPlayer, side m
        return startBoard.valueAfter(move, maxPlayerSide);
     });
     movesSearched += vEnd - vBegin;
+    if(vEnd == vBegin){
+        if(maxPlayer){
+            return -std::numeric_limits<float>::infinity();
+        } else {
+            return std::numeric_limits<float>::infinity();
+        }
+    }
     if(maxPlayer){
         return *std::max_element(vBegin, vEnd);
     } else {

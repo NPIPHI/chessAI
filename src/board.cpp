@@ -83,18 +83,22 @@ void board::setDefault() {
 
 std::vector<chessMove> board::validMoves(side side) const {
     std::vector<chessMove> moves;
+    bool hasKing = false;
     for(char rank = 0; rank < 8; rank++){
         for(char file = 0; file < 8; file++){
             piece p = atSquare({rank, file});
             if(p.side == side){
+                if(p.type == king){
+                    hasKing = true;
+                }
                 auto pieceMoves = p.moves(state, {rank, file});
                 moves.insert(moves.end(), pieceMoves.begin(), pieceMoves.end());
             }
         }
     }
-    moves.erase(std::remove_if(moves.begin(), moves.end(), [&](chessMove move){
-        return applyMove(move).inCheck(side);
-    }), moves.end());
+    if(!hasKing){
+        return {};
+    }
     return moves;
 }
 
@@ -129,8 +133,8 @@ float board::value(enum side side) const {
     for(char rank = 0; rank < 8; rank++){
         for(char file = 0; file < 8; file++){
             piece p = atSquare({rank, file});
-            if(p.side == white) val += p.value({rank, file});
-            if(p.side == black) val -= p.value({rank, file});
+            if(p.side == white) val += p.value({rank, file}, side);
+            if(p.side == black) val -= p.value({rank, file}, side);
         }
     }
     if(side == black){
@@ -161,17 +165,21 @@ std::string board::print() const {
 
 chessMove * board::inPlaceValidMoves(chessMove * out, side side) const {
     chessMove * head = out;
+    bool hasKing = false;
     for(char rank = 0; rank < 8; rank++){
         for(char file = 0; file < 8; file++){
             piece p = atSquare({rank, file});
             if(p.side == side){
+                if(p.type == king){
+                    hasKing = true;
+                }
                 head = p.inPlaceMoves(head, state, {rank, file});
             }
         }
     }
-    head = std::remove_if(out, head, [&](chessMove move){
-        return applyMove(move).inCheck(side);
-    });
+    if(!hasKing){
+        return out;
+    }
     return head;
 }
 
@@ -184,16 +192,16 @@ float board::valueAfter(chessMove move, enum side side) const {
     piece startPiece = state[move.start.rank][move.start.file];
     piece endPiece = state[move.end.rank][move.end.file];
     if(startPiece.side == white){
-       value -= startPiece.value(move.start);
-       value += startPiece.value(move.end);
+       value -= startPiece.value(move.start, side);
+       value += startPiece.value(move.end, side);
     } else {
-        value += startPiece.value(move.start);
-        value -= startPiece.value(move.end);
+        value += startPiece.value(move.start, side);
+        value -= startPiece.value(move.end, side);
     }
     if(endPiece.side == white){
-        value -= endPiece.value(move.end);
+        value -= endPiece.value(move.end, side);
     } else {
-        value += endPiece.value(move.end);
+        value += endPiece.value(move.end, side);
     }
     if(side == black) value *= -1;
     return value;

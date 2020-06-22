@@ -169,12 +169,18 @@ moveType piece::isMovable(piece target) const {
     return invalid;
 }
 
-float piece::value(square sq) const {
+float piece::value(square sq, enum side side) const {
     if(type == pawn){
         if(side == black){
             return pieceValue[type] + float(7 - sq.rank)/100;
         } else {
             return pieceValue[type] + float(sq.rank)/100;
+        }
+    }
+    if(type == king){
+        if(this->side != side){
+            //prevents ai from trading kings
+            return pieceValue[type] * 2;
         }
     }
     return pieceValue[type];

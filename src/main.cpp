@@ -115,7 +115,7 @@ void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods)
                 if(mainBoard.isValid({mouse.start, mouse.end}, white)){
                     mainBoard = mainBoard.applyMove({mouse.start, mouse.end});
                     std::cout << mainBoard.print() << std::endl;
-                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 4, black));
+                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 5, black));
                     std::cout << mainBoard.print() << std::endl;
                     dirty = true;
                 }

@@ -8,7 +8,7 @@
 #include <assert.h>
 #include <limits>
 
-int movesSearched;
+long int movesSearched;
 struct {
     chessMove moveBuffer[128];
     float valueBuffer[128];
@@ -30,7 +30,7 @@ std::tuple<chessMove, float> ai::minimaxSlow(const board &startBoard, int depth,
         return {{}, startBoard.value(maxPlayerSide)};
     }
     side evalSide = maxPlayer ? maxPlayerSide : ((maxPlayerSide == white) ? black : white);
-    auto moves = startBoard.validMoves(evalSide);
+    auto moves = startBoard.validMovesFast(evalSide);
     auto children = std::vector<std::tuple<chessMove, float>>(moves.size());
     std::transform(moves.begin(), moves.end(), children.begin(), [startBoard, depth, maxPlayer, maxPlayerSide](chessMove move){
         board b = startBoard.applyMove(move);
@@ -60,7 +60,7 @@ chessMove ai::minimaxHead(const board &startBoard, int depth, side maxPlayerSide
     if(depth <= 1){
         return std::get<chessMove>(minimaxSlow(startBoard, 1, true, maxPlayerSide));
     }
-    auto moves = startBoard.validMoves(maxPlayerSide);
+    auto moves = startBoard.validMovesFast(maxPlayerSide);
     auto values = std::vector<float>(moves.size());
     std::transform(moves.begin(), moves.end(), values.begin(), [&](chessMove move){
         return minimax(startBoard.applyMove(move), depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), false, maxPlayerSide);
@@ -75,7 +75,7 @@ float ai::minimax(const board &startBoard, int depth, float a, float b, bool max
     }
     assert(depth != 0);
     side evalSide = maxPlayer ? maxPlayerSide : ((maxPlayerSide == white) ? black : white);
-    auto moves = startBoard.validMoves(evalSide);
+    auto moves = startBoard.validMovesFast(evalSide);
     if(maxPlayer){
         float value = -std::numeric_limits<float>::infinity();
         for(auto move : moves){
@@ -130,7 +130,7 @@ std::vector<chessMove> ai::minimaxHeadTrace(const board &startBoard, int depth, 
         auto[move, value] = (minimaxSlow(startBoard, 1, true, maxPlayerSide));
         return {move};
     }
-    auto moves = startBoard.validMoves(maxPlayerSide);
+    auto moves = startBoard.validMovesFast(maxPlayerSide);
     auto values = std::vector<float>(moves.size());
     std::transform(moves.begin(), moves.end(), values.begin(), [&](chessMove move){
         return minimax(startBoard.applyMove(move), depth, -std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), false, maxPlayerSide);
@@ -149,7 +149,7 @@ ai::minimaxTrace(const board &startBoard, int depth, float a, float b, bool maxP
         return minimaxBaseTrace(startBoard, depth, maxPlayer, maxPlayerSide);
     }
     side evalSide = maxPlayer ? maxPlayerSide : ((maxPlayerSide == white) ? black : white);
-    auto moves = startBoard.validMoves(evalSide);
+    auto moves = startBoard.validMovesFast(evalSide);
 
     if(maxPlayer){
         auto values = std::vector<float>(moves.size());

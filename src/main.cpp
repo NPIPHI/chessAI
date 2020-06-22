@@ -35,14 +35,14 @@ struct {
     bool selectedStart;
 } mouse;
 
-auto start = std::chrono::high_resolution_clock::now();
-auto end = std::chrono::high_resolution_clock::now();
+std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 
 bool dirty = true;
 board mainBoard;
 int move;
 
-void terminate();
+void cleanUp();
 void mainLoop();
 void glInit();
 
@@ -86,13 +86,13 @@ int main( void ){
 #else
 	do{
 	    mainLoop();
-//	    Sleep(16);
+	    Sleep(16);
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		   glfwWindowShouldClose(window) == 0);
 
 	// Close OpenGL window and terminate GLFW
-    terminate();
+    cleanUp();
 #endif
     return 0;
 }
@@ -104,7 +104,7 @@ void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods)
             int windowWidth, windowHeight;
             glfwGetCursorPos(window, &mouseX, &mouseY);
             glfwGetWindowSize(window, &windowWidth, &windowHeight);
-            square selected((1-mouseY/windowWidth) * 8, mouseX/windowWidth * 8);
+            square selected(char((1-mouseY/windowWidth) * 8), char(mouseX/windowWidth * 8));
             if(!mouse.selectedStart){
                 mouse.selectedStart = true;
                 mouse.start = selected;
@@ -169,8 +169,7 @@ void glInit(){
 
 }
 
-void mainLoop(){
-
+void mainLoop() {
     if(dirty) {
         dirty = false;
 
@@ -241,7 +240,7 @@ void mainLoop(){
     glfwPollEvents();
 }
 
-void terminate(){
+void cleanUp(){
     // Cleanup VBO
     glDeleteBuffers(1, &boardVertex);
     glDeleteVertexArrays(1, &vertexArrayID);

@@ -19,9 +19,12 @@ public:
     [[nodiscard]] std::vector<float> toBuffer() const;
 
     void setDefault();
-    bool isValid(chessMove move, enum side side);
+    bool isValid(chessMove move, enum side side) const;
     void cacheValue() const;
     [[nodiscard]] board applyMove(chessMove move) const;
+    //no check for check
+    [[nodiscard]] std::vector<chessMove> validMovesFast(side side) const;
+    //disallows check
     [[nodiscard]] std::vector<chessMove> validMoves(side side) const;
     chessMove * inPlaceValidMoves(chessMove * out, side side) const;
     [[nodiscard]] piece atSquare(square sq) const;

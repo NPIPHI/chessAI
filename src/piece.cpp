@@ -27,9 +27,8 @@ float pieceValue[] = {
 };
 
 std::tuple<float, float, float, float> piece::UV() const{
-    float y = (side == white) ? 0.5 : 0;
-//    return {0, 0, 1, 1};
-    return {pieceUV[type], y, pieceUV[type] + 0.125, y + 0.5};
+    float y = (side == white) ? 0.5f : 0.f;
+    return {pieceUV[type], y, pieceUV[type] + 0.125f, y + 0.5f};
 }
 
 char piece::homeRank() const {
@@ -177,12 +176,12 @@ float piece::value(square sq, enum side side) const {
             return pieceValue[type] + float(sq.rank)/100;
         }
     }
-    if(type == king){
-        if(this->side != side){
-            //prevents ai from trading kings
-            return pieceValue[type] * 2;
-        }
-    }
+//    if(type == king){
+//        if(this->side != side){
+//            //prevents ai from trading kings
+//            return pieceValue[type] * 2;
+//        }
+//    }
     return pieceValue[type];
 }
 

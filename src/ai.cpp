@@ -66,11 +66,13 @@ chessMove ai::minimaxHead(const board &startBoard, int depth, side maxPlayerSide
     auto values = std::vector<int>(moves.size());
     int bestValue = -inf;
     std::vector<chessMove> bestMoves;
+    chessMove bestMove;
 
     for(chessMove move : moves){
         int moveValue = minimax(startBoard.applyMove(move), depth - 1, bestValue, inf, false, maxPlayerSide);
         if(moveValue > bestValue){
-            bestMoves = {move};
+//            bestMoves = {move};
+            bestMove = move;
             bestValue = moveValue;
         }
         if(moveValue == bestValue){
@@ -83,8 +85,11 @@ chessMove ai::minimaxHead(const board &startBoard, int depth, side maxPlayerSide
         return {};
     }
 
+    std::cout << bestMoves.size();
+
     int randIndex = rand()%bestMoves.size();
 
+    return bestMove;
     return bestMoves[randIndex];
 }
 

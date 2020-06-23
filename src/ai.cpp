@@ -63,21 +63,29 @@ chessMove ai::minimaxHead(const board &startBoard, int depth, side maxPlayerSide
         return std::get<chessMove>(minimaxSlow(startBoard, 1, true, maxPlayerSide));
     }
     auto moves = startBoard.validMovesFast(maxPlayerSide);
-    if(moves.empty()) {
-        std::cout << "checkmate" << std::endl;
-        return {};
-    }
     auto values = std::vector<int>(moves.size());
     int bestValue = -inf;
-    chessMove bestMove;
+    std::vector<chessMove> bestMoves;
+
     for(chessMove move : moves){
         int moveValue = minimax(startBoard.applyMove(move), depth - 1, bestValue, inf, false, maxPlayerSide);
         if(moveValue > bestValue){
-            bestMove = move;
+            bestMoves = {move};
             bestValue = moveValue;
         }
+        if(moveValue == bestValue){
+            bestMoves.push_back(move);
+        }
     }
-    return bestMove;
+
+    if(bestMoves.empty()){
+        std::cout << "checkmate or stalemate";
+        return {};
+    }
+
+    int randIndex = rand()%bestMoves.size();
+
+    return bestMoves[randIndex];
 }
 
 int ai::minimax(const board &startBoard, int depth, int a, int b, bool maxPlayer, side maxPlayerSide) {

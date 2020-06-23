@@ -86,7 +86,7 @@ int main( void ){
 #else
 	do{
 	    mainLoop();
-//	    Sleep(500);
+	    Sleep(16);
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		   glfwWindowShouldClose(window) == 0);
@@ -184,9 +184,9 @@ void mainLoop() {
 //            start = std::chrono::high_resolution_clock::now();
 //        }
 //        if (move % 2) {
-//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 6, white));
+//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 4, white));
 //        } else {
-//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 6, black));
+//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 4, black));
 //        }
 //        dirty = true;
 //        move++;

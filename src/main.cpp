@@ -86,7 +86,7 @@ int main( void ){
 #else
 	do{
 	    mainLoop();
-	    Sleep(16);
+//	    Sleep(500);
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		   glfwWindowShouldClose(window) == 0);
@@ -121,7 +121,7 @@ void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods)
                         return;
                     }
 
-                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 5, black));
+                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 2, black));
                     std::cout << mainBoard.print() << std::endl;
                     if(mainBoard.checkmate(white)){
                         std::cout << "checkmate!" << std::endl;
@@ -179,14 +179,15 @@ void glInit(){
 
 void mainLoop() {
 
-//    if (move < 20) {
+//    if (move < 200) {
 //        if (move == 0) {
 //            start = std::chrono::high_resolution_clock::now();
 //        }
 //        if (move % 2) {
-//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 3, white));
-//        } else
-//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 3, black));
+//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 6, white));
+//        } else {
+//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 6, black));
+//        }
 //        dirty = true;
 //        move++;
 //        if (move == 50) {

@@ -41,9 +41,11 @@ public:
     char homeRank() const;
     [[nodiscard]] std::tuple<float, float, float, float> UV() const;
     [[nodiscard]] moveType isMovable(piece target) const;
-    [[nodiscard]] float value(square sq, enum side side) const;
+    [[nodiscard]] int value(square sq) const;
 
     char ascii() const;
+
+    char oppositeRow() const;
 };
 
 

@@ -16,14 +16,14 @@ float pieceUV[] = {
 };
 
 
-float pieceValue[] = {
+int pieceValue[] = {
         0,
-        1,
-        3,
-        3,
-        5,
-        9,
-        100
+        1000,
+        3000,
+        3000,
+        5000,
+        9000,
+        10000
 };
 
 std::tuple<float, float, float, float> piece::UV() const{
@@ -168,12 +168,12 @@ moveType piece::isMovable(piece target) const {
     return invalid;
 }
 
-float piece::value(square sq, enum side side) const {
+int piece::value(square sq) const {
     if(type == pawn){
         if(side == black){
-            return pieceValue[type] + float(7 - sq.rank)/100;
+            return pieceValue[type] + 7 - sq.rank;
         } else {
-            return pieceValue[type] + float(sq.rank)/100;
+            return pieceValue[type] + sq.rank;
         }
     }
     return pieceValue[type];
@@ -311,4 +311,13 @@ chessMove * piece::inPlaceMoves(chessMove * out, const std::array<std::array<pie
         }
     }
     return out;
+}
+
+char piece::oppositeRow() const {
+    if(side == black){
+        return 0;
+    }
+    if(side == white){
+        return 7;
+    }
 }

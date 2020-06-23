@@ -28,15 +28,15 @@ public:
     [[nodiscard]] std::vector<chessMove> validMoves(side side) const;
     chessMove * inPlaceValidMoves(chessMove * out, side side) const;
     [[nodiscard]] piece atSquare(square sq) const;
-    [[nodiscard]] float value(enum side side) const;
-    [[nodiscard]] float valueAfter(chessMove move, enum side side) const;
+    [[nodiscard]] int value(enum side side) const;
+    [[nodiscard]] int valueAfter(chessMove move, enum side side) const;
     [[nodiscard]] std::string print() const;
     [[nodiscard]] bool inCheck(side side) const;
     [[nodiscard]] bool checkmate(side side) const;
 private:
     //side being threatened
     [[nodiscard]] std::vector<square> threatedSquares(side side) const;
-    mutable float valueCache;
+    mutable int valueCache;
 };
 
 

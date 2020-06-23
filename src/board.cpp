@@ -108,13 +108,13 @@ piece board::atSquare(square sq) const {
     }
 }
 
-float board::value(enum side side) const {
-    float val = 0;
+int board::value(enum side side) const {
+    int val = 0;
     for(char rank = 0; rank < 8; rank++){
         for(char file = 0; file < 8; file++){
             piece p = atSquare({rank, file});
-            if(p.side == white) val += p.value({rank, file}, side);
-            if(p.side == black) val -= p.value({rank, file}, side);
+            if(p.side == white) val += p.value({rank, file});
+            if(p.side == black) val -= p.value({rank, file});
         }
     }
     if(side == black){
@@ -163,23 +163,34 @@ void board::cacheValue() const{
     valueCache = value(white);
 }
 
-float board::valueAfter(chessMove move, enum side side) const {
-    float value = valueCache;
+int board::valueAfter(chessMove move, enum side side) const {
+    int value = valueCache;
     piece startPiece = state[move.start.rank][move.start.file];
     piece endPiece = state[move.end.rank][move.end.file];
-    if(startPiece.side == white){
-       value -= startPiece.value(move.start, side);
-       value += startPiece.value(move.end, side);
+    if(startPiece.type == pawn && move.end.rank == startPiece.oppositeRow()){
+        if (startPiece.side == white){
+            value -= startPiece.value(move.start);
+            value += piece{white, queen}.value(move.end);
+        } else {
+            value += startPiece.value(move.start);
+            value -= piece{black, queen}.value(move.end);
+        }
     } else {
-        value += startPiece.value(move.start, side);
-        value -= startPiece.value(move.end, side);
+        if (startPiece.side == white) {
+            value -= startPiece.value(move.start);
+            value += startPiece.value(move.end);
+        } else {
+            value += startPiece.value(move.start);
+            value -= startPiece.value(move.end);
+        }
     }
     if(endPiece.side == white){
-        value -= endPiece.value(move.end, side);
+        value -= endPiece.value(move.end);
     } else {
-        value += endPiece.value(move.end, side);
+        value += endPiece.value(move.end);
     }
-    if(side== black) value *= -1;
+
+    if(side == black) value *= -1;
     return value;
 }
 

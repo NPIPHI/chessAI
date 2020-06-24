@@ -127,7 +127,6 @@ void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods)
                     }
 
                     mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 6, black));
-                    std::cout << mainBoard.print() << std::endl;
                     if(mainBoard.checkmate(white)){
                         std::cout << "checkmate!" << std::endl;
                         return;

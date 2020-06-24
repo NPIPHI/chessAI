@@ -17,10 +17,6 @@ struct {
 constexpr int inf = std::numeric_limits<int>::max();
 
 chessMove ai::bestMove(const board &board, int depth, side side) {
-    if(depth > 7) {
-        std::cout << "depth too deep" << std::endl;
-        return {};
-    }
     movesSearched = 0;
     auto move = ai::minimaxHead(board, depth, side);
     std::cout << "Moves searched: " << movesSearched << std::endl;
@@ -65,32 +61,21 @@ chessMove ai::minimaxHead(const board &startBoard, int depth, side maxPlayerSide
     auto moves = startBoard.validMovesFast(maxPlayerSide);
     auto values = std::vector<int>(moves.size());
     int bestValue = -inf;
-    std::vector<chessMove> bestMoves;
     chessMove bestMove;
 
     for(chessMove move : moves){
         int moveValue = minimax(startBoard.applyMove(move), depth - 1, bestValue, inf, false, maxPlayerSide);
         if(moveValue > bestValue){
-//            bestMoves = {move};
             bestMove = move;
             bestValue = moveValue;
         }
-        if(moveValue == bestValue){
-            bestMoves.push_back(move);
-        }
     }
 
-    if(bestMoves.empty()){
-        std::cout << "checkmate or stalemate";
+    if(moves.empty()){
+        std::cout << "checkmate or stalemate" << std::endl;
         return {};
     }
-
-    std::cout << bestMoves.size();
-
-    int randIndex = rand()%bestMoves.size();
-
     return bestMove;
-    return bestMoves[randIndex];
 }
 
 int ai::minimax(const board &startBoard, int depth, int a, int b, bool maxPlayer, side maxPlayerSide) {

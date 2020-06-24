@@ -316,8 +316,7 @@ chessMove * piece::inPlaceMoves(chessMove * out, const std::array<std::array<pie
 char piece::oppositeRow() const {
     if(side == black){
         return 0;
-    }
-    if(side == white){
+    } else {
         return 7;
     }
 }

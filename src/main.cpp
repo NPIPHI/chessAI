@@ -22,10 +22,15 @@
 GLFWwindow* window;
 GLuint boardProgram;
 GLuint pieceProgram;
+GLuint highlightProgram;
+
+GLuint vertexArrayID;
+
 GLuint boardVertex;
 GLuint piecesVertex;
-GLuint vertexArrayID;
+GLuint highlightVertex;
 GLuint piecesTexture;
+
 GLuint pieceVertexLocation;
 GLuint pieceUVLocation;
 
@@ -59,12 +64,12 @@ int main( void ){
     // Create and compile our GLSL program from the shaders
     boardProgram = LoadShaders("res/boardVertex.glsl", "res/boardFragment.glsl" );
     pieceProgram = LoadShaders("res/pieceVertex.glsl", "res/pieceFragment.glsl" );
+    highlightProgram = LoadShaders("res/highlightVertex.glsl", "res/highlightFragment.glsl");
 
     pieceVertexLocation = glGetAttribLocation(pieceProgram, "vertexPosition");
     pieceUVLocation = glGetAttribLocation(pieceProgram, "uv");
 
-    //fill vertex buffer with triangle
-    static const GLfloat boardVertexData[] = {
+    const GLfloat boardVertexData[] = {
             -1.0f, -1.0f,
             -1.0f, 3.0f,
             3.0f,  -1.0f,
@@ -75,6 +80,7 @@ int main( void ){
     glBufferData(GL_ARRAY_BUFFER, sizeof(boardVertexData), boardVertexData, GL_STATIC_DRAW);
 
     glGenBuffers(1, &piecesVertex);
+    glGenBuffers(1, &highlightVertex);
 
     mainBoard = {};
     mainBoard.setDefault();
@@ -100,6 +106,7 @@ int main( void ){
 void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods){
     if(clickedWindow == window){
         if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+            dirty = true;
             double mouseX, mouseY;
             int windowWidth, windowHeight;
             glfwGetCursorPos(window, &mouseX, &mouseY);
@@ -112,16 +119,14 @@ void mouseCallback(GLFWwindow * clickedWindow, int button, int action, int mods)
                 mouse.selectedStart = false;
                 mouse.end = selected;
                 if(mainBoard.isValid({mouse.start, mouse.end}, white)){
-                    dirty = true;
 
                     mainBoard = mainBoard.applyMove({mouse.start, mouse.end});
-                    std::cout << mainBoard.print() << std::endl;
                     if(mainBoard.checkmate(black)){
                         std::cout << "checkmate!" << std::endl;
                         return;
                     }
 
-                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 4, black));
+                    mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 6, black));
                     std::cout << mainBoard.print() << std::endl;
                     if(mainBoard.checkmate(white)){
                         std::cout << "checkmate!" << std::endl;
@@ -179,14 +184,14 @@ void glInit(){
 
 void mainLoop() {
 
-//    if (move < 200) {
+//    if (move < 50) {
 //        if (move == 0) {
 //            start = std::chrono::high_resolution_clock::now();
 //        }
 //        if (move % 2) {
-//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 4, white));
+//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 2, white));
 //        } else {
-//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 4, black));
+//            mainBoard = mainBoard.applyMove(ai::bestMove(mainBoard, 5, black));
 //        }
 //        dirty = true;
 //        move++;
@@ -202,65 +207,97 @@ void mainLoop() {
 
         auto pieceBuffer = mainBoard.toBuffer();
         int pieceVertexCount = pieceBuffer.size()/4;
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, piecesVertex);
+            glBufferData(GL_ARRAY_BUFFER, pieceBuffer.size() * sizeof(float), pieceBuffer.data(), GL_STATIC_DRAW);
+            // Clear the screen
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindBuffer(GL_ARRAY_BUFFER, piecesVertex);
-        glBufferData(GL_ARRAY_BUFFER, pieceBuffer.size() * sizeof(float), pieceBuffer.data(), GL_STATIC_DRAW);
-        // Clear the screen
-        glClear(GL_COLOR_BUFFER_BIT);
+            // Use our shader
+            glUseProgram(boardProgram);
 
-        // Use our shader
-        glUseProgram(boardProgram);
+            // 1rst attribute buffer : vertices
+            glEnableVertexAttribArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, boardVertex);
+            glVertexAttribPointer(
+                    0,                  // location of our vertex attribute
+                    2,                  // size
+                    GL_FLOAT,           // type
+                    GL_FALSE,           // normalized, does not matter when input type is float
+                    0,                  // stride
+                    (void *) 0            // array buffer offset
+            );
 
-        // 1rst attribute buffer : vertices
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, boardVertex);
-        glVertexAttribPointer(
-                0,                  // location of our vertex attribute
-                2,                  // size
-                GL_FLOAT,           // type
-                GL_FALSE,           // normalized, does not matter when input type is float
-                0,                  // stride
-                (void *) 0            // array buffer offset
-        );
+            glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        // Draw the triangle !
-        glDrawArrays(GL_TRIANGLES, 0, 3); // 3 indices starting at 0 -> 1 triangle
+            glDisableVertexAttribArray(0);
+        }
+        {
+            glUseProgram(pieceProgram);
 
-        glDisableVertexAttribArray(0);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, piecesTexture);
+            glUniform1i(GL_TEXTURE_2D, 0);
 
-        glUseProgram(pieceProgram);
+            glEnableVertexAttribArray(pieceVertexLocation);
+            glBindBuffer(GL_ARRAY_BUFFER, piecesVertex);
+            glVertexAttribPointer(
+                    pieceVertexLocation,                  // location of our vertex attribute
+                    2,                  // size
+                    GL_FLOAT,           // type
+                    GL_FALSE,           // normalized, does not matter when input type is float
+                    16,                  // stride in bytes
+                    (void *) 0            // array buffer offset
+            );
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, piecesTexture);
-        glUniform1i(GL_TEXTURE_2D, 0);
+            glEnableVertexAttribArray(pieceUVLocation);
+            glBindBuffer(GL_ARRAY_BUFFER, piecesVertex);
+            glVertexAttribPointer(
+                    pieceUVLocation,                  // location of our vertex attribute
+                    2,                  // size
+                    GL_FLOAT,           // type
+                    GL_FALSE,           // normalized, does not matter when input type is float
+                    16,                  // stride in bytes
+                    (void *) 8          // array buffer offset
+            );
 
-        glEnableVertexAttribArray(pieceVertexLocation);
-        glBindBuffer(GL_ARRAY_BUFFER, piecesVertex);
-        glVertexAttribPointer(
-                pieceVertexLocation,                  // location of our vertex attribute
-                2,                  // size
-                GL_FLOAT,           // type
-                GL_FALSE,           // normalized, does not matter when input type is float
-                16,                  // stride in bytes
-                (void *) 0            // array buffer offset
-        );
+            glDrawArrays(GL_TRIANGLES, 0, pieceVertexCount);
 
-        glEnableVertexAttribArray(pieceUVLocation);
-        glBindBuffer(GL_ARRAY_BUFFER, piecesVertex);
-        glVertexAttribPointer(
-                pieceUVLocation,                  // location of our vertex attribute
-                2,                  // size
-                GL_FLOAT,           // type
-                GL_FALSE,           // normalized, does not matter when input type is float
-                16,                  // stride in bytes
-                (void *) 8          // array buffer offset
-        );
+            glDisableVertexAttribArray(0);
+            glDisableVertexAttribArray(1);
 
-        glDrawArrays(GL_TRIANGLES, 0, pieceVertexCount);
+        }
+        if(mouse.selectedStart){
+            glUseProgram(highlightProgram);
+            float vData[12] = {
+                    0, 0,
+                    1, 0,
+                    0, 1,
+                    1, 0,
+                    1, 1,
+                    0, 1
+            };
+            for(int i = 0; i < 12; i+=2){
+                vData[i] = vData[i]/8 + float(mouse.start.file) / 8;
+                vData[i+1] = vData[i+1]/8 + float(mouse.start.rank) / 8;
+            }
+            glBindBuffer(GL_ARRAY_BUFFER, highlightVertex);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(vData), vData, GL_STATIC_DRAW);
 
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(
+                    0,
+                    2,
+                    GL_FLOAT,
+                    GL_FALSE,
+                    0,
+                    nullptr
+                    );
 
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+
+            glDisableVertexAttribArray(0);
+        }
         // Swap buffers
         glfwSwapBuffers(window);
     }
